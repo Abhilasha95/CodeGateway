@@ -1,0 +1,84 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fswiss\fcharset0 Arial;}{\f2\fnil Consolas;}{\f3\fnil\fcharset0 Consolas;}{\f4\fswiss\fcharset0 Courier New;}}
+{\colortbl ;\red0\green0\blue0;\red255\green0\blue0;\red0\green80\blue50;\red212\green212\blue212;}
+{\*\generator Riched20 10.0.18362}\viewkind4\uc1 
+\pard\sl240\slmult1\b\f0\fs22\lang9\par
+\par
+
+\pard\par
+\par
+\fs32 1.5 Dynamic versus static design\fs22\par
+\par
+\fs28 Funtionality:\cf1\b0\f1\par
+\fs22 The capabilty of the software product to provide the functions which meet stated and implied needs when the software is used under specified conditions.\par
+\cf2\b Dynamic design that is used already\cf1\b0 :-\par
+transmitfromAtoB() int he \cf2 simpleGateway \cf1 class this function can work under any combition of UART and CAN. The definition of this function handles all combinations of ports without identifying the type of port before (Only an exception of a NONE port is handled.).\par
+This is done by creating a \cf3\highlight4\f2\fs20 CPortFactory\cf1\highlight0\f1\fs22 class and having the three situations (NONE, UART, CAN)  in an enumeration.  Any combination of the two can be selected and we have to pass only  \cf3\highlight4\f2 CPortFactory\f3\lang2057  objects.Whether the choice of port is a Uart or a Can or neither will be evaluated only during runtime.\cf1\highlight0\f1\lang9\par
+\cf2\b StaticDesign:-\par
+\cf0\b0 First we would have a function that first  identify the two ports that are chosen by the user.\par
+Then accordingly we would have four different ways of handling the four different combinations of the UART and CAN Port (probably four differnet definitions of the same transmit function).\par
+Instead of having two different classes for the two different ports (If we were to program using only C we would have only structs) and we could use a switch case to separate the four situtations. Accordingly the program will work under each switch case depending on whichever ports were selected by the user.\par
+\cf2 What is better:- In terms of external quality goals, both the static and the dynamic design works equally well, But in terms of internal quality goals where Functionality should provide \cf1 good cohesion of components, classes and functions , the dynamic structure is better than the static one.\fs40\par
+\par
+\cf2\fs22\par
+\cf0\par
+\b\fs28 Reliability\fs24 :-\par
+\par
+\fs22 Reliability is defined as the probability of failure-free software operation for a specified period of time in a particular environment.\par
+\cf2 Dynamic design that is already used:-\par
+\cf0 A CentralErrorHandler class (application having an one exception class) has been created. An object is used to call the specific error scenario. (The four scenarios are depicted in the enumeration in the configuration file.) Any new situation that arrises can be added in the configuration file and can be called from any other class as and when required.\par
+\cf2 Possible static design.\par
+\cf0 Eliminate the use of enumuration and no separate error class should be created. Should use only basic variable matching to check if a faulty condition has occured.\par
+Then exceptional situation can be handled using a try catch block and error message can be thrown or program terminated.\par
+\cf2 What is better and why:-\par
+\cf0 While external reliabilty is more or less same whether it is static or dynamic (because to the user it is only essential that the error is handled not necessarily how.) \par
+For internal reliabilty :- From the Programmer's point of view  Static designs catch errors during the early stages of programming. It leaves no room for type errors as you continue coding. Static programming prevents the changing of variables in the program. This feature makes them ideal for lengthy  programs. Dynamic programming catches errors only during the execution. In doing so, it may slow down the programming process \par
+\par
+\fs28 Usability:-\fs22\par
+The capabilty of the software product to understood learnet and used when used under specific conditions (ability to create multiple instances).\par
+\cf2 Dynamic Design that is already in use\par
+\cf1\b0 Is \b abstract, hiding implementation \b0 details \endash enabling the developer to change the implementation without affecting the interface.\par
+Is \b descriptive\b0\endash good names and types provide a clear usage guideline\fs40\par
+\fs22 The system communicates through a generic port class, which will provide the interface.\fs24  \fs22 A concrete class (in dynamic implimentation example \f4 CUartPort\f1 and\f4 CCanPort\f1 ) will provide the hardware related. \par
+\cf2 Static design that can be used.\par
+\cf0 Port refactoring can also be done using C language (or any other assembly level language) exclusively\cf1\fs24\par
+\fs22 In C, to implement abstraction we have to declare private types and functions in the C file (not Header). Use static data if needed. example:-\par
+\cf2 #define public \par
+#define private static.\par
+\cf0 Which is better and Why:- (for Internal quality goals.)\par
+The dynamic design is better because there are separate classes for driver and there is a good cohesion the class , component and functional level which cannot be brought about by any basic assembly level language or even C for that matter.\cf2\par
+\cf0\par
+\par
+\b\fs28 Efficiency\fs22 :-\par
+The capabbilty of the software product to provide appropriate performance relative to the amount of resources used , under stated conditions.\par
+\cf2 Dynamic design that is in use.\par
+\cf0 To support dynamic data sizes a ringBuffer class has been created so that objects of the class can be used to store data before reading and writing them. Also since we have a separate class for this purpose we can create a double buffer (one for sender and one for receiver) so that we can read and write from one driver to another at the same time.\par
+\cf2 Possible Static design.\par
+\cf0 Instead of creating a separate ringBuffer class (which would otherwise be inherited by different port classes), we can create an array of a required package size and type (eg \cf3\highlight4\b0\f2\fs20 uint8_t\cf0\highlight0\b\f1\fs22 ) and declare it as a private field in each port class. It would function same as the driver buffer.\par
+An even more static design would involve a mere structures instead of classes.\par
+struct UartPort\par
+\{\par
+  char driverBuffer[10];\par
+  \'85\'85\'85\'85.\par
+\};\par
+\cf2 What is better and why?\par
+\cf0 When it comes to external performance, having separate buffers allows the reading and writing at the same time thus enhancing the user experience.\par
+But when it comes to internal effienciency, having too many classes would result in blocking of memory and if not handled properly (through proper error handling can cause a buffer flow.) From a programmers point of view, a dynamic design requires more work for esuring optimum memory consumption.\par
+\par
+\fs28 Maintainability\fs22 :-\par
+Maintainability is itself a measure of the ease to modify code, higher maintainability means less time to make a change. Coding standards are a way to achieve high maintainability and are developed as a result of previous experiences, they aren't universal and are dependent on developer preferences.\par
+\cf2 Dynamic Design in use:- (Code Refactoring)\par
+\cf0 The current code includes separate classes for different Ports, so when a new port is needed we can simply add another class, define another package size, inherit Buffer class and just include another entry into the PortFactory enumuration then we are mostly good to go. We can create new defintions for the \cf1\highlight4\f2\fs20 readByte_hw\f3\lang2057 () and the \f2 writeByte_hw\f3 () to bring about new implementations.\cf2\highlight0\f1\fs22\lang9\par
+Static Design that can be used: \par
+\cf0 A pure static implementation of a Uart or CAN Port can also be done using C language, in which case if we were to add another port we would have to write long lines of code specific to the new Port. This would not only increase the difficulty in upgrading a software to include multiple ports but also decrease code readabilty and increase complexibilty.\par
+\par
+\fs28 Portability\fs22 :-\cf2\par
+\cf0 Portability, in relation to software, is a measure of how easily an application can be transferred from one computer environment to another. A computer software application is considered portable to a new environment if the effort required to adapt it to the new environment is within reasonable limits.\par
+\cf2 Dynamic Design in use:-\par
+\cf0 A global class has been included which uses typedefs and enumeration as a way of declaring complex data structures. \par
+The typedef keyword allows the programmer to create new names for types such as int or, more commonly in C++, templated types--it literally stands for "type definition". Typedefs can be used both to provide more clarity to your code and to make it easier to make changes to the underlying data types that you use.\par
+\cf2 Static Desiging using C:-\cf0\par
+The size of type int is not exactly specified by C, it is only supposed to be at least equal to 16 bits. So, on some processor architecture, compiler implements it as 16 bits whereas on some other as 32 bits. So, if a programmer writes int a, it would take 2 byte on the 1st architecture and 4 byte on the second -- i.e. non-uniform behavior across platforms (lack of portability considering the 'size' aspect).\par
+To avoid that, the types are defined using names like uint_16 or uint_32 in some global header files (say, types.h). Inside types.h, the user-defined types would be correctly mapped to the suitable native type -- and there may be processor specific defines in types.h.\par
+Later, a programmer would use these types(uint_16, uint_32 etc.) and won't bother about the size himself.\cf2\par
+}
+ 
